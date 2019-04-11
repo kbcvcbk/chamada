@@ -41,7 +41,7 @@ void loop() {
     }
     initi = true;
   }
-  if (init) {
+  if (initi) {
     digitalWrite(led, LOW);
     if (!digitalRead(a)) {
       digitalWrite(led, HIGH);
