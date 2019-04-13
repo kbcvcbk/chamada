@@ -16,6 +16,36 @@ int d = 5;
 int con = 6;
 int led = 9;
 
+void codeWrite(String cd) {
+  code = code + cd;
+  digitalWrite(led, LOW);
+  delay(200);
+  digitalWrite(led, HIGH);
+}
+
+void choiceWrite(String cd) {
+  choice = cd;
+  digitalWrite(led, HIGH);
+  delay(200);
+  digitalWrite(led, LOW);
+}
+
+void ledSuccess() {
+  digitalWrite(led, HIGH);
+  delay(100);
+  digitalWrite(led, LOW);
+  delay(100);
+  digitalWrite(led, HIGH);
+  delay(100);
+  digitalWrite(led, LOW);
+}
+
+void ledFail() {
+  digitalWrite(led, HIGH);
+  delay(500);
+  digitalWrite(led, LOW);
+}
+
 void setup() {
   Serial.begin(9600);
   pinMode(a, INPUT_PULLUP);
@@ -27,86 +57,64 @@ void setup() {
 }
 
 void loop() {
-  if (!initi) { // se o controle ainda não foi inicializado
-    code = "";  // limpe o código do aluno
-    digitalWrite(led, HIGH);  // acenda o led
+  if (!initi) {
+    // se o controle ainda não foi inicializado
+    // limpe o código do aluno e acenda o led
+    code = "";
+    digitalWrite(led, HIGH);
     int count = 0;
-    while (count < codeSize) {  // e rode o código abaixo até que
-                                // o código de aluno inteiro tenha
-                                // sido escrito.
-      if (!digitalRead(a)) {
-        digitalWrite(led, LOW);
-        delay(200);
-        digitalWrite(led, HIGH);
-        code = code + "00";
+    // e rode o código abaixo até que
+    // o código de aluno inteiro tenha
+    // sido escrito.
+    while (count < codeSize) {
+      // se o botão estiver apertado (ou seja, for igual a LOW)
+      // escreva o código e aumente o contador (que conta quanto
+      // do código do aluno já foi escrito)
+      if (digitalRead(a) == LOW) {
+        codeWrite("A");
         count++;
       }
-      if (!digitalRead(b)) {
-        digitalWrite(led, LOW);
-        delay(200);
-        digitalWrite(led, HIGH);
-        code = code + "01";
+      if (digitalRead(b) == LOW) {
+        codeWrite("B");
         count++;
       }
-      if (!digitalRead(c)) {
-        digitalWrite(led, LOW);
-        delay(200);
-        digitalWrite(led, HIGH);
-        code = code + "10";
+      if (digitalRead(c) == LOW) {
+        codeWrite("C");
         count++;
       }
-      if (!digitalRead(d)) {
-        digitalWrite(led, LOW);
-        delay(200);
-        digitalWrite(led, HIGH);
-        code = code + "11";
+      if (digitalRead(d) == LOW) {
+        codeWrite("D");
         count++;
       }
     }
-    initi = true;
+    initi = true; // o controle foi inicializado!
   }
-  if (initi) {  // caso o controle já tenha sido atualizado
-                // entre no modo de resposta à quiz
+  if (initi) {  // caso o controle já tenha sido inicializado
+    // entre no modo de resposta à quiz
     digitalWrite(led, LOW);
-    if (!digitalRead(a)) {
-      digitalWrite(led, HIGH);
-      choice = "00";
-      delay(200);
-      digitalWrite(led, LOW);
+    if (digitalRead(a) == LOW) {
+      choiceWrite("A");
     }
-    if (!digitalRead(b)) {
-      digitalWrite(led, HIGH);
-      choice = "01";
-      delay(200);
-      digitalWrite(led, LOW);
+    if (digitalRead(b) == LOW) {
+      choiceWrite("B");
     }
-    if (!digitalRead(c)) {
-      digitalWrite(led, HIGH);
-      choice = "10";
-      delay(200);
-      digitalWrite(led, LOW);
+    if (digitalRead(c) == LOW) {
+      choiceWrite("C");
     }
-    if (!digitalRead(d)) {
-      digitalWrite(led, HIGH);
-      choice = "11";
-      delay(200);
-      digitalWrite(led, LOW);
+    if (digitalRead(d) == LOW) {
+      choiceWrite("D");
     }
 
     if (!digitalRead(con)) {
       if (choice == "") {
-        digitalWrite(led, HIGH);
-        delay(500);
-        digitalWrite(led, LOW);
+        // se nenhuma opção estiver selecionada,
+        // envia mensagem de erro pelo led
+        ledFail();
       } else {
-        digitalWrite(led, HIGH);
-        Serial.println(code + choice);
-        delay(100);
-        digitalWrite(led, LOW);
-        delay(100);
-        digitalWrite(led, HIGH);
-        delay(100);
-        digitalWrite(led, LOW);
+        // caso contrário, envia o código pela seria
+        // e envia mensagem de sucesso pelo led
+        Serial.println(code + " " + choice);
+        ledSuccess();
       }
     }
   }
