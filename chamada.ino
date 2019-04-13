@@ -32,8 +32,8 @@ void loop() {
     digitalWrite(led, HIGH);  // acenda o led
     int count = 0;
     while (count < codeSize) {  // e rode o código abaixo até que
-      // o código de aluno inteiro tenha
-      // sido escrito.
+                                // o código de aluno inteiro tenha
+                                // sido escrito.
       if (!digitalRead(a)) {
         digitalWrite(led, LOW);
         delay(200);
@@ -66,31 +66,27 @@ void loop() {
     initi = true;
   }
   if (initi) {  // caso o controle já tenha sido atualizado
-    // entre no modo de resposta à quiz
+                // entre no modo de resposta à quiz
     digitalWrite(led, LOW);
     if (!digitalRead(a)) {
-      Serial.println("button a pressed!");
       digitalWrite(led, HIGH);
       choice = "00";
       delay(200);
       digitalWrite(led, LOW);
     }
     if (!digitalRead(b)) {
-      Serial.println("button b pressed!");
       digitalWrite(led, HIGH);
       choice = "01";
       delay(200);
       digitalWrite(led, LOW);
     }
     if (!digitalRead(c)) {
-      Serial.println("button c pressed!");
       digitalWrite(led, HIGH);
       choice = "10";
       delay(200);
       digitalWrite(led, LOW);
     }
     if (!digitalRead(d)) {
-      Serial.println("button d pressed!");
       digitalWrite(led, HIGH);
       choice = "11";
       delay(200);
@@ -98,14 +94,20 @@ void loop() {
     }
 
     if (!digitalRead(con)) {
-      digitalWrite(led, HIGH);
-      Serial.println(code + choice);
-      delay(100);
-      digitalWrite(led, LOW);
-      delay(100);
-      digitalWrite(led, HIGH);
-      delay(100);
-      digitalWrite(led, LOW);
+      if (choice == "") {
+        digitalWrite(led, HIGH);
+        delay(500);
+        digitalWrite(led, LOW);
+      } else {
+        digitalWrite(led, HIGH);
+        Serial.println(code + choice);
+        delay(100);
+        digitalWrite(led, LOW);
+        delay(100);
+        digitalWrite(led, HIGH);
+        delay(100);
+        digitalWrite(led, LOW);
+      }
     }
   }
 }
