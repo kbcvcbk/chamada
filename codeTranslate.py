@@ -1,7 +1,7 @@
 import serial as srl
 
 comm = str(11)
-codeSize = int()
+codeSize = int(4)
 
 def configComm(porta):
     global comm
@@ -22,14 +22,14 @@ def stripCode(num):
     print(codeSize)
     return num >> 4
 
-def parseCode(num, debug=False):
+def parseCode(num, sep_ans=True, debug=False):
     if debug: print(f"num = {num:b}")
     code = str()
     if debug: print(f"code size = {codeSize}")
     if debug: print(f"num2parse = {num:b}")
 
     for i in range(codeSize):
-        if i == 1: code += " "
+        if (i == 1) and (sep_ans): code += " "
         cur = (num >> (2*i))&3
         if debug:
             print("i = {0}\nnum = {1:b}\nnum&3: {2}".format(

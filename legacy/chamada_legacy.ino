@@ -4,8 +4,8 @@ bool initi = false;
 // variáveis que controlam o código final que vai ser escrito na
 // serial p/ indicar qual o aluno e qual sua escolha
 int codeSize = 4;
-unsigned int code;
-char choice;
+String code;
+String choice;
 
 // pinos, a-d são os butões de escolha, con é o botão de
 // confirmação e led é o led (duuuh)
@@ -16,46 +16,14 @@ int d = 5;
 int con = 6;
 int led = 9;
 
-void codeWrite(char cd) {
-  if (code != 0) {
-    code <<=2;
-  }
-  switch (cd) {
-    case 'A':
-      code += 0;
-      break;
-    case 'B':
-      code += 1;
-      break;
-    case 'C':
-      code += 2;
-      break;
-    case 'D':
-      code += 3;
-      break;
-  }
+void codeWrite(String cd) {
+  code = code + cd;
   digitalWrite(led, LOW);
   delay(200);
   digitalWrite(led, HIGH);
 }
 
-void codeSign() {
-  codeWrite(choice);
-  code <<= 4;
-  code += codeSize + 3;
-  Serial.println(code);
-}
-
-void debugCode() {
-  Serial.print(code);
-  Serial.print(" = ");
-  for (int i = 13; i >= 0; i--) {
-    Serial.print((code >> i) & 1);
-  }
-  Serial.println();
-}
-
-void choiceWrite(char cd) {
+void choiceWrite(String cd) {
   choice = cd;
   digitalWrite(led, HIGH);
   delay(200);
@@ -92,7 +60,7 @@ void loop() {
   if (!initi) {
     // se o controle ainda não foi inicializado
     // limpe o código do aluno e acenda o led
-    code = 0;
+    code = "";
     digitalWrite(led, HIGH);
     int count = 0;
     // e rode o código abaixo até que
@@ -103,19 +71,19 @@ void loop() {
       // escreva o código e aumente o contador (que conta quanto
       // do código do aluno já foi escrito)
       if (digitalRead(a) == LOW) {
-        codeWrite('A');
+        codeWrite("A");
         count++;
       }
       if (digitalRead(b) == LOW) {
-        codeWrite('B');
+        codeWrite("B");
         count++;
       }
       if (digitalRead(c) == LOW) {
-        codeWrite('C');
+        codeWrite("C");
         count++;
       }
       if (digitalRead(d) == LOW) {
-        codeWrite('D');
+        codeWrite("D");
         count++;
       }
     }
@@ -125,16 +93,16 @@ void loop() {
     // entre no modo de resposta à quiz
     digitalWrite(led, LOW);
     if (digitalRead(a) == LOW) {
-      choiceWrite('A');
+      choiceWrite("A");
     }
     if (digitalRead(b) == LOW) {
-      choiceWrite('B');
+      choiceWrite("B");
     }
     if (digitalRead(c) == LOW) {
-      choiceWrite('C');
+      choiceWrite("C");
     }
     if (digitalRead(d) == LOW) {
-      choiceWrite('D');
+      choiceWrite("D");
     }
 
     if (!digitalRead(con)) {
@@ -145,8 +113,7 @@ void loop() {
       } else {
         // caso contrário, envia o código pela seria
         // e envia mensagem de sucesso pelo led
-        codeSign();
-        debugCode();
+        Serial.println(code + " " + choice);
         ledSuccess();
       }
     }
