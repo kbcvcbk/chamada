@@ -3,7 +3,7 @@ import serial as srl
 def stripCode(num, debug=False):
     code_size = num&15
     if debug: print("code_size:", code_size)
-    return (num >> 4, code_size)
+    return (num >> 4, code_size - 2)
 
 def parseCode(num, code_size, sep_ans=True, debug=False):
     if debug: print(f"num = {num}")
