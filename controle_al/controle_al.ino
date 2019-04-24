@@ -146,7 +146,6 @@ void loop() {
         // caso contrário, envia o código pela seria
         // e envia mensagem de sucesso pelo led
         codeSign();
-        debugCode();
         ledSuccess();
       }
     }
