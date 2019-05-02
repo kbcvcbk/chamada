@@ -1,5 +1,7 @@
 import serial.tools.list_ports as list_ports
 import serial as srl
+import codeHandling as ch
+import os
 import time
 
 reading = False
@@ -22,8 +24,8 @@ def readSerial(ardus, timeto=30):
                 writeCode(line.strip())
 
 def writeCode(code):
-    with open(time.strftime("[%y]%d-%m"), "a") as file:
-        file.write("{0},{1}\n".format(code, time.strftime("%H:%M:%S")))
+    with open(time.strftime("[%y]%d-%m.cha"), "a") as file:
+        file.write("{0},{1}\n".format(ch.parseCode(code, 5), time.strftime("%H:%M:%S")))
 
 def main():
     readSerial(findPorts(),10)
