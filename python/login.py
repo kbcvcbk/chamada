@@ -59,3 +59,21 @@ def login(username, password):
     else:
         print("Senha inválida")
         return False
+
+def main():
+    commands = {"login": login, "register": register}
+    prompt = "> "
+    while True:
+        inp = input(prompt).split()
+        if len(inp) == 3 and inp[0] in commands:
+            comm = inp[0]
+            user = inp[1]
+            pasw = inp[2]
+            commands[comm](user, pasw)
+        elif inp[0] == "exit":
+            break
+        else:
+            print("Invalid usage")
+
+if __name__ == "__main__":
+    main()
