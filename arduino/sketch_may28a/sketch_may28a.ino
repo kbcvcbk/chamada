@@ -1,7 +1,7 @@
 /* AQ! Controle Aluno
-Arduino code by kalil & felinto*/
+  Arduino code by kalil & felinto*/
 
-#define TYPE TYPE_LCD
+#define TYPE_LED
 
 // code
 #define code "AACD"
@@ -24,6 +24,7 @@ Arduino code by kalil & felinto*/
 char estado = INAT;
 
 String choice = " ";
+bool choice_set = false;
 String serial = " ";
 bool right = false;
 long post_end;
@@ -32,23 +33,21 @@ int right_awnser_idx = 4;
 #define POST_TIME 4000
 
 // global
+void read_serial() {
+  serial = Serial.readString();
+  serial.trim();
+  if (debug) Serial.println(serial);
+}
 void trocar_estado() {
   int available_bytes = Serial.available();
-  if (available_bytes > 0) {
-    if (estado == INAT) {
-      serial = Serial.readString();
-      serial.trim();
-      if (debug) Serial.println(serial);
-      if (serial == "start") estado = CHAM;
-    } else if (estado == CHAM) {
-      serial = Serial.readString();
-      serial.trim();
-      if (debug) Serial.println(serial);
-      Serial.println(serial.substring(0, 3));
-      post_end = millis() + POST_TIME;
-      estado = POST;
-    }
-  } else if (estado == POST) {
+  if (available_bytes > 0 && estado == INAT) { // começa a chamada
+    read_serial();
+    if (serial == "start") estado = CHAM;
+  } else if (estado == CHAM && available_bytes > 0) { //termina a chamada
+    read_serial();
+    post_end = millis() + POST_TIME;
+    estado = POST;
+  } else if (estado == POST) { // retorna à inat
     if (millis() > post_end) estado = INAT;
   }
 }
@@ -57,12 +56,16 @@ void trocar_estado() {
 void get_choice() {
   if (digitalRead(BOT_A) == LOW) {
     choice = 'A';
+    choice_set = true;
   } else if (digitalRead(BOT_B) == LOW) {
     choice = 'B';
+    choice_set = true;
   } else if (digitalRead(BOT_C) == LOW) {
     choice = 'C';
+    choice_set = true;
   } else if (digitalRead(BOT_D) == LOW) {
     choice = 'D';
+    choice_set = true;
   }
   if (debug and estado == CHAM) {
     Serial.print("Choice = ");
@@ -86,14 +89,6 @@ void set_right() {
   }
 }
 
-void right_ans() {
-  Serial.println("Reposta certa!");
-}
-
-void wrong_ans() {
-  Serial.println("Resposta errada!");
-}
-
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
@@ -102,30 +97,19 @@ void setup() {
   pinMode(BOT_C, INPUT_PULLUP);
   pinMode(BOT_D, INPUT_PULLUP);
   pinMode(BOT_CON, INPUT_PULLUP);
-  #if (TYPE == TYPE_LCD)
-  _initlcd();
-  #endif
+#ifdef TYPE_LCD
+  init_lcd();
+#endif
 }
 
 void loop() {
+  trocar_estado();
+  update_led_state();
   if (estado == INAT) {
-    trocar_estado();
-    #if (TYPE == TYPE_LCD)
-    #endif
-    if (debug) Serial.println("INAT");
   } else if (estado == CHAM) {
-    if (debug) Serial.println("CHAM");
     get_choice();
     write_choice();
-    trocar_estado();
   } else {
-    if (debug) Serial.println("POST");
-    set_right();    // figures out if choice is right
-    if (right) {
-      right_ans();  // outputs right answer
-    } else {
-      wrong_ans();  // outputs wrong answer
-    }
-    trocar_estado();
+    set_right();
   }
 }
