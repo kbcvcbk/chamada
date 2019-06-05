@@ -19,16 +19,16 @@
 #define BOT_CON 6
 
 // debug
-#define debug false
+#define debug true
 
-char estado = INAT;
+int estado = INAT;
 
 String choice = " ";
 bool choice_set = false;
 String serial = " ";
 bool right = false;
 long post_end;
-int right_awnser_idx = 4;
+int right_answer_idx = 4;
 
 #define POST_TIME 4000
 
@@ -42,7 +42,7 @@ void trocar_estado() {
   int available_bytes = Serial.available();
   if (available_bytes > 0 && estado == INAT) { // começa a chamada
     read_serial();
-    if (serial == "start") estado = CHAM;
+    estado = CHAM;
   } else if (estado == CHAM && available_bytes > 0) { //termina a chamada
     read_serial();
     post_end = millis() + POST_TIME;
@@ -76,13 +76,18 @@ void get_choice() {
 void write_choice() {
   if (digitalRead(BOT_CON) == LOW) {
     String output = code + choice;
+    #ifdef TYPE_LED
+    blink_led();
+    #endif
     Serial.println(output);
   }
 }
 
 // estado = post
 void set_right() {
-  if (serial[right_awnser_idx] == choice[0]) {
+  char right_choice = serial[right_answer_idx];
+  if (debug) { Serial.print("Right choice: "); Serial.println(right_choice); }
+  if (right_choice == choice[0]) {
     right = true;
   } else {
     right = false;
@@ -97,12 +102,12 @@ void setup() {
   pinMode(BOT_C, INPUT_PULLUP);
   pinMode(BOT_D, INPUT_PULLUP);
   pinMode(BOT_CON, INPUT_PULLUP);
-#ifdef TYPE_LCD
   init_lcd();
-#endif
+  init_led();
 }
 
 void loop() {
+  if (debug) Serial.println(estado);
   trocar_estado();
   update_led_state();
   if (estado == INAT) {
