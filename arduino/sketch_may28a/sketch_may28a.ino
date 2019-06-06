@@ -19,18 +19,20 @@
 #define BOT_CON 6
 
 // debug
-#define debug true
+#define debug false
 
 int estado = INAT;
 
-String choice = " ";
-bool choice_set = false;
-String serial = " ";
-bool right = false;
-long post_end;
-int right_answer_idx = 4;
+String serial = String(" ");
 
-#define POST_TIME 4000
+char choice = ' ';
+bool choice_set = false;
+int chamada_time;
+
+bool right = false;
+
+long post_end;
+#define POST_TIME 6000
 
 // global
 void read_serial() {
@@ -38,17 +40,28 @@ void read_serial() {
   serial.trim();
   if (debug) Serial.println(serial);
 }
+
 void trocar_estado() {
   int available_bytes = Serial.available();
   if (available_bytes > 0 && estado == INAT) { // começa a chamada
     read_serial();
-    estado = CHAM;
+    if (serial.toInt()) {
+      estado = CHAM;
+      #ifdef TYPE_LCD
+        chamada_time = serial.toInt()
+      #endif
+    }
   } else if (estado == CHAM && available_bytes > 0) { //termina a chamada
     read_serial();
     post_end = millis() + POST_TIME;
     estado = POST;
   } else if (estado == POST) { // retorna à inat
-    if (millis() > post_end) estado = INAT;
+    
+    if (millis() > post_end) {
+      choice = ' ';
+      choice_set = false;
+      estado = INAT;
+    }
   }
 }
 
@@ -56,16 +69,24 @@ void trocar_estado() {
 void get_choice() {
   if (digitalRead(BOT_A) == LOW) {
     choice = 'A';
-    choice_set = true;
+    #ifdef TYPE_LED
+    blink_led();
+    #endif
   } else if (digitalRead(BOT_B) == LOW) {
     choice = 'B';
-    choice_set = true;
+    #ifdef TYPE_LED
+    blink_led();
+    #endif
   } else if (digitalRead(BOT_C) == LOW) {
     choice = 'C';
-    choice_set = true;
+    #ifdef TYPE_LED
+    blink_led();
+    #endif
   } else if (digitalRead(BOT_D) == LOW) {
     choice = 'D';
-    choice_set = true;
+    #ifdef TYPE_LED
+    blink_led();
+    #endif
   }
   if (debug and estado == CHAM) {
     Serial.print("Choice = ");
@@ -75,8 +96,11 @@ void get_choice() {
 
 void write_choice() {
   if (digitalRead(BOT_CON) == LOW) {
-    String output = code + choice;
+    String output = code + String(choice);
+    choice_set = true;
     #ifdef TYPE_LED
+    blink_led();
+    delay(200);
     blink_led();
     #endif
     Serial.println(output);
@@ -85,9 +109,9 @@ void write_choice() {
 
 // estado = post
 void set_right() {
-  char right_choice = serial[right_answer_idx];
+  char right_choice = serial[0];
   if (debug) { Serial.print("Right choice: "); Serial.println(right_choice); }
-  if (right_choice == choice[0]) {
+  if (right_choice == choice && choice_set) {
     right = true;
   } else {
     right = false;
