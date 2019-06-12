@@ -1,16 +1,22 @@
 #ifdef TYPE_LED
-#define LED_R 11
+#define LED_R 9
 #define LED_G 10
-#define LED_B 9
+#define LED_B 11
 #endif
 
 int* current_color;
 
-int roxo[3] = {150, 0, 255};
-int larj[3] = {200, 220, 0};
-int verm[3] = {120, 0, 0};
-int verd[3] = {0, 120, 0};
-int none[3] = {0, 0, 0};
+//int roxo[3] = {150, 0, 255};
+//int larj[3] = {200, 220, 0};
+//int verm[3] = {120, 0, 0};
+//int verd[3] = {0, 120, 0};
+//int none[3] = {0, 0, 0};
+
+int roxo[3] = {100, 255, 0};
+int larj[3] = {255, 30, 255};
+int verm[3] = {130, 255, 255};
+int verd[3] = {255, 130, 255};
+int none[3] = {255, 255, 255};
 
 void init_led() {
 #ifdef TYPE_LED
